@@ -16,6 +16,16 @@ public class Example implements CommandListener<Void> {
         System.out.println(registry.getCommands());
 
         registry.execute("this command doesnt exist", null);
+
+        // Output:
+        /*
+         * CommandEvent(args=[a], executor=null) 
+         * CommandEvent(args=[a], executor=null) 
+         * 
+         * [@xyz.e3ndr.consolidate.command.Command(owner=_default_, minimumArguments=0, permission=_default_, aliases=[], description=Another test command!, name=Test2), @xyz.e3ndr.consolidate.command.Command(owner=_default_, minimumArguments=0, permission=_default_, aliases=[], description=A test command!, name=Test)]
+         * 
+         * Exception in thread "main" xyz.e3ndr.consolidate.exception.CommandNameException
+         */
     }
 
     @Command(description = "A test command!", name = "Test")
