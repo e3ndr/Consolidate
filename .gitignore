@@ -3,3 +3,4 @@ target*
 .project
 .classpath
 src/main/java/xyz/e3ndr/consolidate/Test.java
+.factorypath

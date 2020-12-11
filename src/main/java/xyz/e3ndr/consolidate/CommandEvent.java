@@ -2,6 +2,8 @@ package xyz.e3ndr.consolidate;
 
 import java.util.List;
 
+import org.jetbrains.annotations.Nullable;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -16,7 +18,7 @@ import xyz.e3ndr.consolidate.exception.CommandNameException;
 public class CommandEvent<T> {
     private final @NonNull CommandRegistry<T> registry;
     private final @NonNull List<String> args;
-    private final @NonNull T executor;
+    private final @Nullable T executor;
 
     public String[] getArgsArray() {
         return this.args.toArray(new String[0]);
