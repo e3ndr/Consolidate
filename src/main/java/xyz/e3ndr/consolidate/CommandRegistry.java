@@ -104,18 +104,6 @@ public class CommandRegistry<T> {
      * Execute.
      *
      * @param input the input
-     * @throws CommandNameException thrown if a command can't be found for the given input
-     * @throws CommandExecutionException thrown if the command generates an exception
-     * @throws ArgumentsLengthException thrown if the input's arguments are less than the required amount
-     */
-    public void execute(@NonNull String input) throws CommandNameException, CommandExecutionException, ArgumentsLengthException {
-        this.execute(input, null);
-    }
-
-    /**
-     * Execute.
-     *
-     * @param input the input
      * @param executor the executor
      * @throws CommandNameException thrown if a command can't be found for the given input
      * @throws CommandExecutionException thrown if the command generates an exception
