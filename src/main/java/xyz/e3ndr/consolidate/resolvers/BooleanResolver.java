@@ -13,6 +13,7 @@ public class BooleanResolver implements Resolver<Boolean> {
             case "1":
             case "on":
             case "enabled":
+            case "enable":
             case "true":
                 return true;
 
