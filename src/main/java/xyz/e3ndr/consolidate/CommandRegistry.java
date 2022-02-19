@@ -117,8 +117,12 @@ public class CommandRegistry<T> {
      *                                    than the required amount
      * @throws CommandPermissionException thrown if the executor does not have the
      *                                    required permission to run the command.
+     * 
+     * @return                            the result of the command execution, or
+     *                                    null if the method result was void.
      */
-    public void execute(@NonNull String input, @Nullable T executor, @Nullable PermissionChecker<T> permissionChecker) throws CommandNameException, CommandExecutionException, ArgumentsLengthException, CommandPermissionException {
+    @SuppressWarnings("unchecked")
+    public <R> R execute(@NonNull String input, @Nullable T executor, @Nullable PermissionChecker<T> permissionChecker) throws CommandNameException, CommandExecutionException, ArgumentsLengthException, CommandPermissionException {
         input = input.trim();
 
         List<String> args = new ArrayList<>();
@@ -151,7 +155,7 @@ public class CommandRegistry<T> {
 
                 CommandEvent<T> event = new CommandEvent<>(this, Collections.unmodifiableList(args), executor);
 
-                context.execute(event);
+                return (R) context.execute(event);
             } else {
                 throw new ArgumentsLengthException();
             }
@@ -202,9 +206,9 @@ public class CommandRegistry<T> {
         private final Command command;
         private final Method method;
 
-        public void execute(CommandEvent<T> event) throws CommandExecutionException {
+        public Object execute(CommandEvent<T> event) throws CommandExecutionException {
             try {
-                this.method.invoke(this.instance, event);
+                return this.method.invoke(this.instance, event);
             } catch (Exception e) {
                 throw new CommandExecutionException(e);
             }
