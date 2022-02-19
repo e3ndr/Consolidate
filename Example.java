@@ -10,12 +10,12 @@ public class Example implements CommandListener<Void> {
 
         registry.addCommand(new Example());
 
-        registry.execute("test a", null);
-        registry.execute("_default_:test \"a\"", null);
+        registry.execute("test a", null, null);
+        registry.execute("_default_:test \"a\"", null, null);
 
         System.out.println(registry.getCommands());
 
-        registry.execute("this command doesnt exist", null);
+        registry.execute("this command doesnt exist", null, null);
 
         // Output:
         /*

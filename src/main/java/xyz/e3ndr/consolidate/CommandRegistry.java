@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.jetbrains.annotations.Nullable;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -23,6 +24,7 @@ import xyz.e3ndr.consolidate.command.CommandListener;
 import xyz.e3ndr.consolidate.exception.ArgumentsLengthException;
 import xyz.e3ndr.consolidate.exception.CommandExecutionException;
 import xyz.e3ndr.consolidate.exception.CommandNameException;
+import xyz.e3ndr.consolidate.exception.CommandPermissionException;
 import xyz.e3ndr.consolidate.resolvers.BooleanResolver;
 import xyz.e3ndr.consolidate.resolvers.ByteResolver;
 import xyz.e3ndr.consolidate.resolvers.CharResolver;
@@ -103,19 +105,27 @@ public class CommandRegistry<T> {
     /**
      * Execute.
      *
-     * @param input the input
-     * @param executor the executor
-     * @throws CommandNameException thrown if a command can't be found for the given input
-     * @throws CommandExecutionException thrown if the command generates an exception
-     * @throws ArgumentsLengthException thrown if the input's arguments are less than the required amount
+     * @param  input                      the input
+     * @param  executor                   the executor
+     * @param  permissionChecker          the permission checker
+     * 
+     * @throws CommandNameException       thrown if a command can't be found for the
+     *                                    given input
+     * @throws CommandExecutionException  thrown if the command generates an
+     *                                    exception
+     * @throws ArgumentsLengthException   thrown if the input's arguments are less
+     *                                    than the required amount
+     * @throws CommandPermissionException thrown if the executor does not have the
+     *                                    required permission to run the command.
      */
-    public void execute(@NonNull String input, T executor) throws CommandNameException, CommandExecutionException, ArgumentsLengthException {
+    public void execute(@NonNull String input, @Nullable T executor, @Nullable PermissionChecker<T> permissionChecker) throws CommandNameException, CommandExecutionException, ArgumentsLengthException, CommandPermissionException {
         input = input.trim();
 
         List<String> args = new ArrayList<>();
         Matcher m = pattern.matcher(input);
 
-        // Use a matcher to split input by space, and allowing spaces in arguments via quotes
+        // Use a matcher to split input by space, and allowing spaces in arguments via
+        // quotes
         while (m.find()) {
             args.add(m.group(1).trim().replace("\"", ""));
         }
@@ -129,6 +139,16 @@ public class CommandRegistry<T> {
             ExecutionContext<T> context = possible.iterator().next();
 
             if (context.command.minimumArguments() <= args.size()) {
+                if (context.command.permission() != Command.DEFAULT_PERMISSION) {
+                    if (permissionChecker == null) {
+                        throw new CommandExecutionException(new IllegalStateException("A command required the checking of a permission but the executor did not provide a permission checker."));
+                    }
+
+                    if (!permissionChecker.check(executor, context.command.permission())) {
+                        throw new CommandPermissionException("You are missing the required permission: " + context.command.permission());
+                    }
+                }
+
                 CommandEvent<T> event = new CommandEvent<>(this, Collections.unmodifiableList(args), executor);
 
                 context.execute(event);
@@ -143,9 +163,9 @@ public class CommandRegistry<T> {
     /**
      * Adds a resolver.
      *
-     * @param <E> the element type
+     * @param <E>      the element type
      * @param resolver the resolver
-     * @param clazzes the clazzes to register under
+     * @param clazzes  the clazzes to register under
      */
     @SafeVarargs
     public final <E> void addResolver(@NonNull Resolver<E> resolver, @NonNull Class<E>... clazzes) {
@@ -157,10 +177,12 @@ public class CommandRegistry<T> {
     /**
      * Resolves a value.
      *
-     * @param <E> the element type
-     * @param value the value
-     * @param clazz the clazz
-     * @return the element
+     * @param  <E>                      the element type
+     * @param  value                    the value
+     * @param  clazz                    the clazz
+     * 
+     * @return                          the element
+     * 
      * @throws IllegalArgumentException to be thrown if the value cannot be parsed
      */
     @SuppressWarnings("unchecked")

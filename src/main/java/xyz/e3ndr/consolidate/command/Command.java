@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Command {
-    String NO_PERMISSION = "_default_";
+    String DEFAULT_PERMISSION = "_default_";
     String NO_OWNER = "_default_";
 
     String name();
@@ -24,6 +24,6 @@ public @interface Command {
 
     String owner() default NO_OWNER;
 
-    String permission() default NO_PERMISSION;
+    String permission() default DEFAULT_PERMISSION;
 
 }
